@@ -10,9 +10,12 @@ import {
   Dimensions,
 } from 'react-native';
 import CountDown from 'react-native-countdown-component';
+import { Icon } from 'react-native-elements'
 import { MonoText } from '../components/StyledText';
-const { width, height } = Dimensions.get('window')
 
+const { width, height } = Dimensions.get('window')
+const checkedTickColor = '#55FF00'
+const uncheckedTickColor = '#7A7A7A'
 export default class HomeScreen extends Component<{}> {
   constructor(props) {
     super(props);
@@ -21,6 +24,21 @@ export default class HomeScreen extends Component<{}> {
       date: "24-08-2019",
       gateway: "AF01",
       seat: "01A",
+      checkStatus: [
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+
     }
   }
 
@@ -52,6 +70,8 @@ export default class HomeScreen extends Component<{}> {
             />
           </View>
         </View>
+
+        {/* Navigation Background */}
         <View style={styles.navigationBackground}>
           <View style={styles.button}>
             <View style={styles.buttonIcon}></View>
@@ -70,59 +90,161 @@ export default class HomeScreen extends Component<{}> {
             <Text style={styles.buttonText}>Emergency</Text>
           </View>
         </View>
+
+        {/* Passenger Status */}
         <Text style={styles.titleText}>Passenger Status</Text>
         <View style={styles.statusBackground}>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[0] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[0] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Navigation</Text>
+            <Text style={styles.buttonText}>Passenger{'\n'}Check In</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[1] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[1] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Ticket</Text>
+            <Text style={styles.buttonText}>Security{'\n'}Check</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[2] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[2] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Mail</Text>
+            <Text style={styles.buttonText}>Waiting at{'\n'}boarding gate</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[3] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[3] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Emergency</Text>
+            <Text style={styles.buttonText}>Passenger{'\n'}Onboarding</Text>
           </View>
         </View>
+
+        {/* Luggage Status */}
         <Text style={styles.titleText}>Luggage Status</Text>
         <View style={styles.statusBackground}>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[4] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[4] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Luggage{'\n'}Check In</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[5] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[5] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Security and{'\n'}Custom Check</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[6] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[6] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Loading</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[7] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[7] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Luggage{'\n'}Onboarding</Text>
           </View>
         </View>
+
+        {/* Itinerary */}
         <Text style={styles.titleText}>Itinerary</Text>
         <View style={styles.statusBackground}>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[8] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[8] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Insurance</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[9] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[9] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Meal</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[10] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[10] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Transport</Text>
           </View>
-          <View style={styles.statusButton}>
+          <View style={this.state.checkStatus[11] ? styles.statusButton : styles.unCheckStatusButton}>
+            <View style={styles.tickIcon}>
+              <Icon
+                name='check-circle'
+                color={this.state.checkStatus[11] ? checkedTickColor : uncheckedTickColor}
+                size={20}
+                type={'material'}
+              />
+            </View>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Merchandise</Text>
           </View>
@@ -243,6 +365,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  unCheckStatusButton: {
+    backgroundColor: '#fff',
+    marginLeft: 10,
+    width: (width - 50) / 4,
+    height: 100,
+    borderColor: '#aaa',
+    borderWidth: 2,
+    borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   promotionBackground: {
     backgroundColor: '#fff',
     marginLeft: 10,
@@ -256,5 +394,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 1,
+  },
+  tickIcon: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
   }
 });
