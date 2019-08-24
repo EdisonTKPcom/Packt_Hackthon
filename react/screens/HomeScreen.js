@@ -19,6 +19,7 @@ import * as firebase from 'firebase';
 import _ from 'lodash';
 import * as Permissions from 'expo-permissions';
 import { Notifications } from 'expo';
+var CryptoJS = require("crypto-js");
 
 const { width, height } = Dimensions.get('window')
 const checkedTickColor = '#55FF00'
@@ -133,6 +134,66 @@ export default class HomeScreen extends Component<{}> {
       return;
     }
     Notifications.addListener(this.handleNotification);
+
+    // var hubname= 'PosHack-IoTHub';
+    // var expiresinmins = '60';
+    // var signingkey = 'ibdzrZxD9r6XDCq/akLyNiaeDvttFIW7era5UMWPScA=';
+    // var policyname = 'iothubowner';
+
+    // var resourceUri = encodeURIComponent(hubname + '.azure-devic.net');
+
+    // var expiry = Math.ceil((Date.now() / 1000) + expiresinmins * 60);
+    // var uriExpiry = resourceUri + '\n' + expiry;
+    // var decodedKey = CryptoJS.enc.Base64.parse(signingkey);
+    // var signature = CryptoJS.HmacSHA256(uriExpiry, decodedKey);
+
+    // var encodedUri = encodeURIComponent(CryptoJS.enc.Base64.stringify(signature));
+
+    // var token = "SharedAccessSignature sr=" + resourceUri + "&sig=" + encodedUri + "&se=" + expiry;
+    // token += "&skn="+ policyname;
+
+    // console.log("Shared Access Signature:" + token);
+
+    // fetch('https://PosHack-IoTHub.azure-devices.net/twins/Container-AK320-03', {
+    //   method: 'PATCH',
+    //   headers: {
+    //     Authorization: token,
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     properties: {
+    //       desired: {
+    //         userLedRed: false
+    //       }
+    //     }
+    //   }),
+    //   qs: { 'api-version': '2018-06-30' },
+    //   json: true
+    // })
+    // .then((response) => response.json())
+    // .then((responseJson) => {
+    //   console.log(responseJson)
+    // })
+    // .catch((error) =>{
+    //   console.error(error);
+    // });
+
+    // var options = { method: 'PATCH',
+    //   url: '',
+    //   qs: { 'api-version': '2018-06-30' },
+    //   body: {
+        //   properties: {
+        //     desired: {
+        //       userLedRed: false
+        //     }
+        //   }
+        // },
+    //   json: true };
+    // request(options, function (error, response, body) {
+    //   if (error) throw new Error(error);
+    //   console.log(body);
+    // });
   }
 
   sendNotification(number) {

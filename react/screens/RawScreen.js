@@ -34,14 +34,10 @@ export default class RawScreen extends Component<{}> {
           </View>
         </ScrollView>
         <TouchableOpacity style={styles.navigateButton} onPress={() => navigate('ScanQR')}>
-          <Icon
-            name='navigation'
-            color={'#FFE2FF'}
-            size={20}
-            type={'material'}
-          />
+          <Image source={require('../assets/images/navigate.png')} style={{width: 30, height: 30}}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.scanButton} onPress={() => navigate('ScanQR')}>
+          <Image source={require('../assets/images/scan.png')} style={{width: 30, height: 30}}/>
         </TouchableOpacity>
       </View>
     )

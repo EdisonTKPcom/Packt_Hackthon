@@ -28,11 +28,11 @@ export default class ShopScreen extends Component<{}> {
     return (
       <View style={styles.container}>
         <View style={styles.listViewRow}>
-          <Image source={require('../assets/images/banking.png')} style={styles.buttonIcon}/>
+          <Image source={require('../assets/images/anchor.png')} style={styles.buttonIcon}/>
           <Text style={styles.whiteText}>Anchors</Text>
         </View>
         <View style={styles.listViewRow}>
-          <Image source={require('../assets/images/banking.png')} style={styles.buttonIcon}/>
+          <Image source={require('../assets/images/bags.png')} style={styles.buttonIcon}/>
           <Text style={styles.whiteText}>Bags</Text>
         </View>
         <View style={styles.listViewRow}>
