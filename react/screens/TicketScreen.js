@@ -36,7 +36,7 @@ export default class TicketScreen extends Component<{}> {
             <Text style={styles.boldText}>Seat : A001</Text>
             <Image source={require('../assets/images/qrCode.png')} style={{width: 200, height: 200}}/>
             <View style={styles.qrCodeDownBackground}>
-              <View style={styles.buttonIcon}></View>
+              <Image source={require('../assets/images/boardingPassSmall.png')} style={styles.buttonIcon}/>
               <View style={styles.marginLeft10}>
                 <Text style={styles.boldText}>Flight Number : AK1543</Text>
                 <Text style={styles.boldText}>Boarding Time : 14:25:45</Text>
@@ -48,7 +48,7 @@ export default class TicketScreen extends Component<{}> {
                 <Text style={styles.longText}>Kuala Lumpur</Text>
                 <Text style={styles.longText}>Malaysia</Text>
               </View>
-              <View style={styles.buttonIcon}></View>
+                <Image source={require('../assets/images/boardingPass.png')} style={styles.boardingPass}/>
               <View style={styles.bottomTextBackground}>
                 <Text style={styles.shortText}>DMK</Text>
                 <Text style={styles.longText}>Bangkok</Text>
@@ -70,7 +70,7 @@ export default class TicketScreen extends Component<{}> {
 
 TicketScreen.navigationOptions = {
   headerBackTitle: null,
-  title: '🛫 Broading Pass',
+  title: '🛫 Boarding Pass',
   headerStyle: {
     backgroundColor: '#0089FF',
   },
@@ -127,12 +127,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  buttonIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#4FFF00',
-  },
   bottomBackground: {
     marginTop: 10,
     flexDirection: 'row',
@@ -148,5 +142,11 @@ const styles = StyleSheet.create({
   longText: {
     color: '#fff',
     fontSize: 14,
-  }
+  },
+  buttonIcon: {
+    width: 40,
+    height: 40,
+    margin: 5,
+    resizeMode: 'contain'
+  },
 });

@@ -4,10 +4,14 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import ScanQRcodeScreen from '../screens/ScanQRcodeScreen';
+import RawScreen from '../screens/RawScreen';
+import ScanQRScreen from '../screens/ScanQRScreen';
+import UpdatedScreen from '../screens/UpdatedScreen';
 import TicketScreen from '../screens/TicketScreen';
-import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import StartScreen from '../screens/StartScreen';
+import ShopScreen from '../screens/ShopScreen';
+import EmergencyScreen from '../screens/EmergencyScreen';
+import InsuranceScreen from '../screens/InsuranceScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -16,9 +20,15 @@ const config = Platform.select({
 
 const HomeStack = createStackNavigator(
   {
+    Start: StartScreen,
     Home: HomeScreen,
+    Insurance: InsuranceScreen,
+    Emergency: EmergencyScreen,
+    Shop: ShopScreen,
+    Raw: RawScreen,
     Ticket: TicketScreen,
-    ScanQR: ScanQRcodeScreen,
+    ScanQR: ScanQRScreen,
+    Updated: UpdatedScreen,
   },
   config
 );
@@ -39,42 +49,8 @@ HomeStack.navigationOptions = {
 
 HomeStack.path = '';
 
-const LinksStack = createStackNavigator(
-  {
-    Links: LinksScreen,
-  },
-  config
-);
-
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
-  ),
-};
-
-LinksStack.path = '';
-
-const SettingsStack = createStackNavigator(
-  {
-    Settings: SettingsScreen,
-  },
-  config
-);
-
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
-  ),
-};
-
-SettingsStack.path = '';
-
 const tabNavigator = createBottomTabNavigator({
-  HomeStack,
-  LinksStack,
-  SettingsStack,
+  Home: { screen: HomeStack, navigationOptions:{tabBarVisible: false} }
 });
 
 tabNavigator.path = '';

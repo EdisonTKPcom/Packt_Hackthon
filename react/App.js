@@ -9,18 +9,6 @@ import AppNavigator from './navigation/AppNavigator';
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
-  // initialize firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyDAZnZkbzw6p73MraY67gmQ4aORU0aFywg",
-    authDomain: "poshack-8567e.firebaseapp.com",
-    databaseURL: "https://poshack-8567e.firebaseio.com",
-    projectId: "poshack-8567e",
-    storageBucket: "poshack-8567e.appspot.com",
-    messagingSenderId: "469625282553",
-    appId: "1:469625282553:web:77d111ddbaec972b"
-  }
-
-  if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig)}
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return (

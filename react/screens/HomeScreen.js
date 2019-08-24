@@ -8,14 +8,22 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  YellowBox,
+  Modal,
+  TouchableHighlight
 } from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import { Icon } from 'react-native-elements'
 import { MonoText } from '../components/StyledText';
+import * as firebase from 'firebase';
+import _ from 'lodash';
+import * as Permissions from 'expo-permissions';
+import { Notifications } from 'expo';
 
 const { width, height } = Dimensions.get('window')
 const checkedTickColor = '#55FF00'
 const uncheckedTickColor = '#7A7A7A'
+const redTickColor = '#FF0000'
 export default class HomeScreen extends Component<{}> {
   constructor(props) {
     super(props);
@@ -24,34 +32,203 @@ export default class HomeScreen extends Component<{}> {
       date: "24-08-2019",
       gateway: "AF01",
       seat: "01A",
-      checkStatus: [
-        true,
+      passengerCheckStatus: [
         false,
         false,
         false,
-        true,
+        0,
+      ],
+      luggageCheckStatus: [
         false,
-        false,
-        false,
-        true,
         false,
         false,
         false,
       ],
+      itemCheckStatus: [
+        false,
+        false,
+        false,
+        false,
+      ],
+      modalVisible: false,
     }
+    // initialize firebase
+    console.disableYellowBox = true
+    YellowBox.ignoreWarnings(['Setting a timer']);
+    const _console = _.clone(console);
+    console.warn = message => {
+      if (message.indexOf('Setting a timer') <= -1) {
+        _console.warn(message);
+      }
+    };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDAZnZkbzw6p73MraY67gmQ4aORU0aFywg",
+      authDomain: "poshack-8567e.firebaseapp.com",
+      databaseURL: "https://poshack-8567e.firebaseio.com",
+      projectId: "poshack-8567e",
+      storageBucket: "poshack-8567e.appspot.com",
+      messagingSenderId: "469625282553",
+      appId: "1:469625282553:web:77d111ddbaec972b"
+    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig) }
+    firebase.database().ref('customer/1001/luggageStatus').on('value', (snapshot) => {
+      collectedData = snapshot.val()
+      if (collectedData == 0) {
+        this.setState({luggageCheckStatus: [false, false, false, false]})
+      } else if (collectedData == 1) {
+        this.sendNotification(5)
+        this.setState({luggageCheckStatus: [true, false, false, false]})
+      } else if (collectedData == 2) {
+        this.setState({luggageCheckStatus: [true, true, false, false]})
+        this.sendNotification(6)
+      } else if (collectedData == 3) {
+        this.setState({luggageCheckStatus: [true, true, true, false]})
+        this.sendNotification(7)
+      } else if (collectedData == 4) {
+        this.setState({luggageCheckStatus: [true, true, true, true]})
+        this.sendNotification(8)
+      }
+    })
+    firebase.database().ref('customer/1001/passengerStatus').on('value', (snapshot) => {
+      collectedData = snapshot.val()
+      if (collectedData == 0) {
+        this.setState({passengerCheckStatus: [false, false, false, 0]})
+      } else if (collectedData == 1) {
+        this.setState({passengerCheckStatus: [true, false, false, 0]})
+        this.setState({itemCheckStatus: [true, false, false, false]})
+        this.sendNotification(1)
+      } else if (collectedData == 2) {
+        this.setState({passengerCheckStatus: [true, true, false, 0]})
+        this.sendNotification(2)
+      } else if (collectedData == 3) {
+        this.setState({passengerCheckStatus: [true, true, true, 0]})
+        this.sendNotification(3)
+      } else if (collectedData == 4) {
+        this.setState({passengerCheckStatus: [true, true, true, 1]})
+        this.sendNotification(4)
+      } else if (collectedData == 5) {
+        this.setState({passengerCheckStatus: [true, true, true, 2]})
+        this.sendNotification(9)
+      }
+    })
+  }
+
+  async componentDidMount() {
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+    let finalStatus = existingStatus;
+
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    console.log(finalStatus)
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      return;
+    }
+    Notifications.addListener(this.handleNotification);
+  }
+
+  sendNotification(number) {
+    let localNotification
+    if (number == 1) {
+      localNotification = {
+        title: 'You have successfully check in boarding Gate!',
+        body: 'Please proceed to custom'
+      };
+    } else if (number == 2) {
+      localNotification = {
+        title: 'You cleared security',
+        body: 'Please proceed to boarding gate or enjoy food in your restaurant'
+      };
+    } else if (number == 3) {
+      localNotification = {
+        title: 'You have successfully check in boarding Gate!',
+        body: 'Please wait patiently in gate for boarding.'
+      };
+    } else if (number == 4) {
+      localNotification = {
+        title: 'You are allowed to onboarding',
+        body: 'Enjoy your journey.'
+      };
+    } else if (number == 5) {
+      localNotification = {
+        title: 'Your luggage had checked in.',
+        body: 'Going for security and custom checking'
+      };
+    } else if (number == 6) {
+      localNotification = {
+        title: 'Your luggage had cleared security and custom check',
+        body: 'Loading into container'
+      };
+    } else if (number == 7) {
+      localNotification = {
+        title: 'Your luggage had been loaded',
+        body: 'Waiting for onboarding'
+      };
+    } else if (number == 8) {
+      localNotification = {
+        title: 'Your luggage had onboarding',
+        body: 'Enjoy your journey.'
+      };
+    } else if (number == 9) {
+      localNotification = {
+        title: 'You are forbidden to onboarding due to overtime',
+        body: 'Your luggage will be offload now. Please proceed to counter for more info.'
+      };
+    }
+    const schedulingOptions = {
+      time: (new Date()).getTime()
+    }
+
+    Notifications.scheduleLocalNotificationAsync(localNotification, schedulingOptions);
+  }
+
+  handleNotification() {
+    console.log('ok! got your notif');
+  }
+
+  setModalVisible(visible) {
+    this.setState({modalVisible: visible});
   }
 
   render() {
     const { navigate } = this.props.navigation;
 
     return (
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+          }}>
+          <View style={styles.modalOuterContainer}>
+            <View style={styles.modalInnerContainer}>
+              <Image source={require('../assets/images/tune.png')} style={styles.insuranceBackgroundImage}/>
+              <View style={styles.insuranceCenter}>
+                <TouchableOpacity onPress={() => navigate('Emergency')} style={styles.insuranceButton}>
+                  <Text style={styles.insuranceButtonText}>Yes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.setModalVisible(false)} style={styles.insuranceButton}>
+                  <Text style={styles.insuranceButtonText}>No</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
         <View style={styles.upperBackground}>
         </View>
         <View style={styles.detailsBackground}>
           {/* Profile Icon */}
-          <View style={styles.icon}>
-          </View>
+          <Image source={require('../assets/images/profilePicture.png')} style={styles.icon}/>
           {/* Profile Details */}
           <View style={styles.details}>
             <Text style={styles.largerText}>{this.state.name}</Text>
@@ -77,210 +254,211 @@ export default class HomeScreen extends Component<{}> {
 
         {/* Navigation Background */}
         <View style={styles.navigationBackground}>
-          <TouchableOpacity style={styles.button} onPress={() => navigate('ScanQR')}>
-            <View style={styles.buttonIcon}></View>
+          <TouchableOpacity style={styles.button} onPress={() => navigate('Raw')}>
+            <Image source={require('../assets/images/navigation.png')} style={styles.buttonIcon}/>
             <Text style={styles.buttonText}>Navigation</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => navigate('Ticket')}>
-            <View style={styles.buttonIcon}></View>
+            <Image source={require('../assets/images/ticket.png')} style={styles.buttonIcon}/>
             <Text style={styles.buttonText}>Ticket</Text>
           </TouchableOpacity>
-          <View style={styles.button}>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Mail</Text>
-          </View>
-          <View style={styles.button}>
-            <View style={styles.buttonIcon}></View>
+          <TouchableOpacity style={styles.button} onPress={() => navigate('Shop')}>
+            <Image source={require('../assets/images/shop.png')} style={styles.buttonIcon}/>
+            <Text style={styles.buttonText}>Shop</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigate('Emergency')}>
+            <Image source={require('../assets/images/emergency.png')} style={styles.buttonIcon}/>
             <Text style={styles.buttonText}>Emergency</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
-        {/* Passenger Status */}
-        <Text style={styles.titleText}>Passenger Status</Text>
-        <View style={styles.statusBackground}>
-          {/* Passenger Status - Check In*/}
-          <View style={this.state.checkStatus[0] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[0] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+        <ScrollView>
+          {/* Passenger Status */}
+          <Text style={styles.titleText}>Passenger Status</Text>
+          <View style={styles.statusBackground}>
+            {/* Passenger Status - Check In*/}
+            <View style={this.state.passengerCheckStatus[0] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.passengerCheckStatus[0] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/passengerCheckIn.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Passenger{'\n'}Check In</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Passenger{'\n'}Check In</Text>
-          </View>
-          {/* Passenger Status - Security Check*/}
-          <View style={this.state.checkStatus[1] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[1] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Passenger Status - Security Check*/}
+            <View style={this.state.passengerCheckStatus[1] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.passengerCheckStatus[1] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/securityCheck.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Security{'\n'}Check</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Security{'\n'}Check</Text>
-          </View>
-          {/* Passenger Status - Waiting at boarding gate*/}
-          <View style={this.state.checkStatus[2] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[2] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Passenger Status - Waiting at boarding gate*/}
+            <View style={this.state.passengerCheckStatus[2] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.passengerCheckStatus[2] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/waitingBoardingGate.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Waiting at{'\n'}boarding gate</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Waiting at{'\n'}boarding gate</Text>
-          </View>
-          {/* Passenger Status - Passenger Onboarding*/}
-          <View style={this.state.checkStatus[3] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[3] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Passenger Status - Passenger Onboarding*/}
+            <View style={this.state.passengerCheckStatus[3] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name={this.state.passengerCheckStatus[3] == 2 ? 'close' : 'check-circle'}
+                  color={this.state.passengerCheckStatus[3] == 0 ? uncheckedTickColor : this.state.passengerCheckStatus[3] == 1 ? checkedTickColor : redTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/passengerOnboarding.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Passenger{'\n'}Onboarding</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Passenger{'\n'}Onboarding</Text>
           </View>
-        </View>
 
-        {/* Luggage Status */}
-        <Text style={styles.titleText}>Luggage Status</Text>
-        <View style={styles.statusBackground}>
-          {/* Luggage Status - Luggage Check In*/}
-          <View style={this.state.checkStatus[4] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[4] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+          {/* Luggage Status */}
+          <Text style={styles.titleText}>Luggage Status</Text>
+          <View style={styles.statusBackground}>
+            {/* Luggage Status - Luggage Check In*/}
+            <View style={this.state.luggageCheckStatus[0] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.luggageCheckStatus[0] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/luggageCheckIn.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Luggage{'\n'}Check In</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Luggage{'\n'}Check In</Text>
-          </View>
-          {/* Luggage Status - Security and Custom Check*/}
-          <View style={this.state.checkStatus[5] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[5] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Luggage Status - Security and Custom Check*/}
+            <View style={this.state.luggageCheckStatus[1] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.luggageCheckStatus[1] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/luggageSecurity.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Security and{'\n'}Custom Check</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Security and{'\n'}Custom Check</Text>
-          </View>
-          {/* Luggage Status - Loading*/}
-          <View style={this.state.checkStatus[6] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[6] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Luggage Status - Loading*/}
+            <View style={this.state.luggageCheckStatus[2] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.luggageCheckStatus[2] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/loading.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Loading</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Loading</Text>
-          </View>
-          {/* Luggage Status - Luggage Onboarding*/}
-          <View style={this.state.checkStatus[7] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[7] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Luggage Status - Luggage Onboarding*/}
+            <View style={this.state.luggageCheckStatus[3] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.luggageCheckStatus[3] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/luggageOnboarding.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Luggage{'\n'}Onboarding</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Luggage{'\n'}Onboarding</Text>
           </View>
-        </View>
 
-        {/* Itinerary */}
-        <Text style={styles.titleText}>Itinerary</Text>
-        <View style={styles.statusBackground}>
-          {/* Itinerary - Insurance*/}
-          <View style={this.state.checkStatus[8] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[8] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+          {/* Itinerary */}
+          <Text style={styles.titleText}>Itinerary</Text>
+          <View style={styles.statusBackground}>
+            {/* Itinerary - Insurance*/}
+            <TouchableOpacity onPress={() => this.setModalVisible(true)} style={this.state.itemCheckStatus[0] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.itemCheckStatus[0] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/insurance.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Insurance</Text>
+            </TouchableOpacity>
+            {/* Itinerary - Meal*/}
+            <View style={this.state.itemCheckStatus[1] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.itemCheckStatus[1] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/meal.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Meal</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Insurance</Text>
-          </View>
-          {/* Itinerary - Meal*/}
-          <View style={this.state.checkStatus[9] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[9] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Itinerary - Transport*/}
+            <View style={this.state.itemCheckStatus[2] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.itemCheckStatus[2] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/transport.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Transport</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Meal</Text>
-          </View>
-          {/* Itinerary - Transport*/}
-          <View style={this.state.checkStatus[10] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[10] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
+            {/* Itinerary - Merchandise*/}
+            <View style={this.state.itemCheckStatus[3] ? styles.statusButton : styles.unCheckStatusButton}>
+              <View style={styles.tickIcon}>
+                <Icon
+                  name='check-circle'
+                  color={this.state.itemCheckStatus[3] ? checkedTickColor : uncheckedTickColor}
+                  size={20}
+                  type={'material'}
+                />
+              </View>
+              <Image source={require('../assets/images/merchandise.png')} style={styles.buttonIcon}/>
+              <Text style={styles.buttonText}>Merchandise</Text>
             </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Transport</Text>
           </View>
-          {/* Itinerary - Merchandise*/}
-          <View style={this.state.checkStatus[11] ? styles.statusButton : styles.unCheckStatusButton}>
-            <View style={styles.tickIcon}>
-              <Icon
-                name='check-circle'
-                color={this.state.checkStatus[11] ? checkedTickColor : uncheckedTickColor}
-                size={20}
-                type={'material'}
-              />
-            </View>
-            <View style={styles.buttonIcon}></View>
-            <Text style={styles.buttonText}>Merchandise</Text>
-          </View>
-        </View>
 
-        {/* Promotion*/}
-        <Text style={styles.titleText}>Promotion</Text>
-        <View style={styles.statusBackground}>
-          <View style={styles.promotionBackground}>
+          {/* Promotion*/}
+          <Text style={styles.titleText}>Promotion</Text>
+          <View style={styles.statusBackground}>
+            <Image source={require('../assets/images/promotion1.png')} style={styles.promotionBackground}/>
+            <Image source={require('../assets/images/promotion2.png')} style={styles.promotionBackground}/>
           </View>
-          <View style={styles.promotionBackground}>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     )
   }
 }
 
 HomeScreen.navigationOptions = {
   header: null,
+  tabBarVisible: false,
 };
 
 const styles = StyleSheet.create({
@@ -297,7 +475,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   detailsBackground: {
-    marginTop: 20,
+    marginTop: 30,
     height: height * 0.15,
     flexDirection: 'row',
   },
@@ -309,10 +487,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#4FFF00',
   },
   buttonIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#4FFF00',
+    width: 40,
+    height: 40,
+    margin: 5,
+    resizeMode: 'contain'
   },
   details: {
     margin: 10,
@@ -403,19 +581,49 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginLeft: 10,
     width: (width - 30) / 2,
-    height: 200,
-    borderColor: '#ddd',
-    borderWidth: 2,
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 1,
+    height: 150,
+    resizeMode: 'contain'
   },
   tickIcon: {
     position: 'absolute',
     top: 2,
     right: 2,
-  }
+  },
+  insuranceBackgroundImage: {
+    width,
+    height: height / 2 - 80,
+    resizeMode: 'contain'
+  },
+  insuranceButton: {
+    width: width - 150,
+    height: 50,
+    backgroundColor: '#FF0000',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  insuranceButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  insuranceCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalOuterContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalInnerContainer: {
+    width: width - 20,
+    height: height * 0.8,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
 });
