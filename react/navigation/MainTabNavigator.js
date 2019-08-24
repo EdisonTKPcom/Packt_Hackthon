@@ -17,8 +17,8 @@ const config = Platform.select({
 const HomeStack = createStackNavigator(
   {
     Home: HomeScreen,
-    ScanQR: ScanQRcodeScreen,
     Ticket: TicketScreen,
+    ScanQR: ScanQRcodeScreen,
   },
   config
 );
