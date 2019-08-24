@@ -38,24 +38,28 @@ export default class HomeScreen extends Component<{}> {
         false,
         false,
       ],
-
     }
   }
 
   render() {
+    const { navigate } = this.props.navigation;
+
     return (
       <ScrollView style={styles.container}>
         <View style={styles.upperBackground}>
         </View>
         <View style={styles.detailsBackground}>
+          {/* Profile Icon */}
           <View style={styles.icon}>
           </View>
+          {/* Profile Details */}
           <View style={styles.details}>
             <Text style={styles.largerText}>{this.state.name}</Text>
             <Text style={styles.smallerText}>{this.state.date}</Text>
             <Text style={styles.smallerText}>Gateway : {this.state.gateway}</Text>
             <Text style={styles.smallerText}>Seat : {this.state.seat}</Text>
           </View>
+          {/* Countdown Timer */}
           <View style={styles.onBoarding}>
             <Text style={styles.onBoardingText}>On Boarding</Text>
             <CountDown
@@ -73,14 +77,14 @@ export default class HomeScreen extends Component<{}> {
 
         {/* Navigation Background */}
         <View style={styles.navigationBackground}>
-          <View style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => navigate('ScanQR')}>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Navigation</Text>
-          </View>
-          <View style={styles.button}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigate('Ticket')}>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Ticket</Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.button}>
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Mail</Text>
@@ -94,6 +98,7 @@ export default class HomeScreen extends Component<{}> {
         {/* Passenger Status */}
         <Text style={styles.titleText}>Passenger Status</Text>
         <View style={styles.statusBackground}>
+          {/* Passenger Status - Check In*/}
           <View style={this.state.checkStatus[0] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -106,6 +111,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Passenger{'\n'}Check In</Text>
           </View>
+          {/* Passenger Status - Security Check*/}
           <View style={this.state.checkStatus[1] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -118,6 +124,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Security{'\n'}Check</Text>
           </View>
+          {/* Passenger Status - Waiting at boarding gate*/}
           <View style={this.state.checkStatus[2] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -130,6 +137,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Waiting at{'\n'}boarding gate</Text>
           </View>
+          {/* Passenger Status - Passenger Onboarding*/}
           <View style={this.state.checkStatus[3] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -147,6 +155,7 @@ export default class HomeScreen extends Component<{}> {
         {/* Luggage Status */}
         <Text style={styles.titleText}>Luggage Status</Text>
         <View style={styles.statusBackground}>
+          {/* Luggage Status - Luggage Check In*/}
           <View style={this.state.checkStatus[4] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -159,6 +168,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Luggage{'\n'}Check In</Text>
           </View>
+          {/* Luggage Status - Security and Custom Check*/}
           <View style={this.state.checkStatus[5] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -171,6 +181,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Security and{'\n'}Custom Check</Text>
           </View>
+          {/* Luggage Status - Loading*/}
           <View style={this.state.checkStatus[6] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -183,6 +194,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Loading</Text>
           </View>
+          {/* Luggage Status - Luggage Onboarding*/}
           <View style={this.state.checkStatus[7] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -200,6 +212,7 @@ export default class HomeScreen extends Component<{}> {
         {/* Itinerary */}
         <Text style={styles.titleText}>Itinerary</Text>
         <View style={styles.statusBackground}>
+          {/* Itinerary - Insurance*/}
           <View style={this.state.checkStatus[8] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -212,6 +225,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Insurance</Text>
           </View>
+          {/* Itinerary - Meal*/}
           <View style={this.state.checkStatus[9] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -224,6 +238,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Meal</Text>
           </View>
+          {/* Itinerary - Transport*/}
           <View style={this.state.checkStatus[10] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -236,6 +251,7 @@ export default class HomeScreen extends Component<{}> {
             <View style={styles.buttonIcon}></View>
             <Text style={styles.buttonText}>Transport</Text>
           </View>
+          {/* Itinerary - Merchandise*/}
           <View style={this.state.checkStatus[11] ? styles.statusButton : styles.unCheckStatusButton}>
             <View style={styles.tickIcon}>
               <Icon
@@ -249,6 +265,8 @@ export default class HomeScreen extends Component<{}> {
             <Text style={styles.buttonText}>Merchandise</Text>
           </View>
         </View>
+
+        {/* Promotion*/}
         <Text style={styles.titleText}>Promotion</Text>
         <View style={styles.statusBackground}>
           <View style={styles.promotionBackground}>

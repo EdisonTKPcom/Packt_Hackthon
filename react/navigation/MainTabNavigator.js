@@ -4,6 +4,8 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
+import ScanQRcodeScreen from '../screens/ScanQRcodeScreen';
+import TicketScreen from '../screens/TicketScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
@@ -15,6 +17,8 @@ const config = Platform.select({
 const HomeStack = createStackNavigator(
   {
     Home: HomeScreen,
+    ScanQR: ScanQRcodeScreen,
+    Ticket: TicketScreen,
   },
   config
 );
