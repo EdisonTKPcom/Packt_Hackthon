@@ -76,17 +76,22 @@ export default class HomeScreen extends Component<{}> {
       collectedData = snapshot.val()
       if (collectedData == 0) {
         this.setState({luggageCheckStatus: [false, false, false, false]})
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 1) {
         this.sendNotification(5)
         this.setState({luggageCheckStatus: [true, false, false, false]})
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 2) {
         this.setState({luggageCheckStatus: [true, true, false, false]})
+        fetch('http://13.250.23.123:9000/off');
         this.sendNotification(6)
       } else if (collectedData == 3) {
         this.setState({luggageCheckStatus: [true, true, true, false]})
+        fetch('http://13.250.23.123:9000/off');
         this.sendNotification(7)
       } else if (collectedData == 4) {
         this.setState({luggageCheckStatus: [true, true, true, true]})
+        fetch('http://13.250.23.123:9000/off');
         this.sendNotification(8)
       }
     })
@@ -94,22 +99,28 @@ export default class HomeScreen extends Component<{}> {
       collectedData = snapshot.val()
       if (collectedData == 0) {
         this.setState({passengerCheckStatus: [false, false, false, 0]})
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 1) {
         this.setState({passengerCheckStatus: [true, false, false, 0]})
         this.setState({itemCheckStatus: [true, false, false, false]})
         this.sendNotification(1)
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 2) {
         this.setState({passengerCheckStatus: [true, true, false, 0]})
         this.sendNotification(2)
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 3) {
         this.setState({passengerCheckStatus: [true, true, true, 0]})
         this.sendNotification(3)
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 4) {
         this.setState({passengerCheckStatus: [true, true, true, 1]})
         this.sendNotification(4)
+        fetch('http://13.250.23.123:9000/off');
       } else if (collectedData == 5) {
         this.setState({passengerCheckStatus: [true, true, true, 2]})
         this.sendNotification(9)
+        fetch('http://13.250.23.123:9000/on');
       }
     })
   }
@@ -119,81 +130,15 @@ export default class HomeScreen extends Component<{}> {
       Permissions.NOTIFICATIONS
     );
     let finalStatus = existingStatus;
-
-    // only ask if permissions have not already been determined, because
-    // iOS won't necessarily prompt the user a second time.
     if (existingStatus !== 'granted') {
-      // Android remote notification permissions are granted during the app
-      // install, so this will only ask on iOS
       const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
       finalStatus = status;
     }
-    console.log(finalStatus)
-    // Stop here if the user did not grant permissions
     if (finalStatus !== 'granted') {
       return;
     }
     Notifications.addListener(this.handleNotification);
 
-    // var hubname= 'PosHack-IoTHub';
-    // var expiresinmins = '60';
-    // var signingkey = 'ibdzrZxD9r6XDCq/akLyNiaeDvttFIW7era5UMWPScA=';
-    // var policyname = 'iothubowner';
-
-    // var resourceUri = encodeURIComponent(hubname + '.azure-devic.net');
-
-    // var expiry = Math.ceil((Date.now() / 1000) + expiresinmins * 60);
-    // var uriExpiry = resourceUri + '\n' + expiry;
-    // var decodedKey = CryptoJS.enc.Base64.parse(signingkey);
-    // var signature = CryptoJS.HmacSHA256(uriExpiry, decodedKey);
-
-    // var encodedUri = encodeURIComponent(CryptoJS.enc.Base64.stringify(signature));
-
-    // var token = "SharedAccessSignature sr=" + resourceUri + "&sig=" + encodedUri + "&se=" + expiry;
-    // token += "&skn="+ policyname;
-
-    // console.log("Shared Access Signature:" + token);
-
-    // fetch('https://PosHack-IoTHub.azure-devices.net/twins/Container-AK320-03', {
-    //   method: 'PATCH',
-    //   headers: {
-    //     Authorization: token,
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     properties: {
-    //       desired: {
-    //         userLedRed: false
-    //       }
-    //     }
-    //   }),
-    //   qs: { 'api-version': '2018-06-30' },
-    //   json: true
-    // })
-    // .then((response) => response.json())
-    // .then((responseJson) => {
-    //   console.log(responseJson)
-    // })
-    // .catch((error) =>{
-    //   console.error(error);
-    // });
-
-    // var options = { method: 'PATCH',
-    //   url: '',
-    //   qs: { 'api-version': '2018-06-30' },
-    //   body: {
-        //   properties: {
-        //     desired: {
-        //       userLedRed: false
-        //     }
-        //   }
-        // },
-    //   json: true };
-    // request(options, function (error, response, body) {
-    //   if (error) throw new Error(error);
-    //   console.log(body);
-    // });
   }
 
   sendNotification(number) {
